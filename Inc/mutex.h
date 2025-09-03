@@ -8,12 +8,12 @@
 #ifndef INC_MUTEX_H_
 #define INC_MUTEX_H_
 
-struct semaphore;
-struct taskController;
+#include <stdint.h>
+#include "scheduler.h"
 
 typedef struct {
-	struct semaphore binarySem;
-	struct taskController* owner;
+	semaphore binarySem;
+	taskController* owner;
 	uint8_t initialOwnerPriority;
 } mutex;
 

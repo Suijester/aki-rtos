@@ -7,6 +7,8 @@
 
 #include "semaphore.h"
 #include "scheduler.h"
+#include "stm32f4xx.h"
+#include "core_cm4.h"
 
 void semaphoreConstructor(semaphore* sem, uint8_t resources) {
 	sem->availableResources = resources;

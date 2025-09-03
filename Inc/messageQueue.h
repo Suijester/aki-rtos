@@ -8,7 +8,8 @@
 #ifndef INC_MESSAGEQUEUE_H_
 #define INC_MESSAGEQUEUE_H_
 
-struct semaphore;
+#include <stdint.h>
+#include "semaphore.h"
 
 typedef struct {
 	void* dataAddress;
@@ -17,9 +18,9 @@ typedef struct {
 	uint8_t head;
 	uint8_t tail;
 
-	struct semaphore itemsAvailable;
-	struct semaphore spacesAvailable;
-	struct semaphore mutex; // if parallel execution occurs
+	semaphore itemsAvailable;
+	semaphore spacesAvailable;
+	semaphore mutex; // if parallel execution occurs
 
 } messageQueue;
 

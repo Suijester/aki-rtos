@@ -8,9 +8,10 @@
 #include "mutex.h"
 #include "semaphore.h"
 #include "scheduler.h"
+#include <stddef.h>
 
 void mutexConstructor(mutex* mutex) {
-	semaphoreConstructor(&mutex->binarySem);
+	semaphoreConstructor(&mutex->binarySem, 1);
 	mutex->initialOwnerPriority = -1;
 	mutex->owner = NULL;
 }

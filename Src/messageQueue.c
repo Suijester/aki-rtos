@@ -6,8 +6,9 @@
  */
 
 #include "messageQueue.h"
-#include "semaphore.h"
 #include <string.h>
+#include "stm32f4xx.h"
+#include "core_cm4.h"
 
 void queueConstructor(messageQueue* queue, void* dataLocation, uint8_t typeSize, uint8_t queueCapacity) {
 	queue->dataAddress = dataLocation;
@@ -87,6 +88,8 @@ int queueReceiveISR(messageQueue* queue, void* destination) {
 
 		semaphorePostISR(&queue->spacesAvailable);
 		__set_PRIMASK(savedPrimask);
+
+		return 1;
 	}
 }
 

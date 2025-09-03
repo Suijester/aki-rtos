@@ -8,6 +8,8 @@
 #ifndef INC_SEMAPHORE_H_
 #define INC_SEMAPHORE_H_
 
+#include <stdint.h>
+
 typedef struct {
 	volatile uint8_t availableResources; // can access if availableResources > 0
 } semaphore;
