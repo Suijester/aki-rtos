@@ -83,41 +83,42 @@ All message queues must be initialized by this function, creating a message queu
 ```
 queueSend(messageQueue* queue, const void* item)
 ```
-If capacity permits in the queue, decrements the number of queue spaces available, copies the item into the messageQueue, and posts a signal that an item is available in the queue. Otherwise, if the queue is full, the task sleeps until spaces are freed. **Cannot be interrupted midway by an ISR, and other threads cannot read or write during this.**
+If capacity permits in the queue, decrements the number of queue spaces available, copies the item into the messageQueue, and posts a signal that an item is available in the queue. Otherwise, if the queue is full, the task sleeps until spaces are freed. _**Cannot be interrupted midway by an ISR, and other threads cannot read or write during this.**_
 ```
 queueReceive(messageQueue* queue, void* destination)
 ```
-If data exists in the queue, decrements the number of items available, copies the item into destination, and posts a signal that a new space is available in the queue. Otherwise, if the queue is empty, the task sleeps until an item is added to the queue. **Cannot be interrupted midway by an ISR, and other threads cannot read or write during this.**
+If data exists in the queue, decrements the number of items available, copies the item into destination, and posts a signal that a new space is available in the queue. Otherwise, if the queue is empty, the task sleeps until an item is added to the queue. _**Cannot be interrupted midway by an ISR, and other threads cannot read or write during this.**_
 
 #### ISR-to-Task Communication
 ```
 int queueSendISR(messageQueue* queue, const void* item)
 ```
-If capacity permits in the queue, decrements the number of queue spaces available, copies the item into the messageQueue, and posts a signal that an item is available in the queue, returning 1 for success. Otherwise, if the queue is full, returns 0 for failure. **Cannot be interrupted midway by an higher priority ISR.**
+If capacity permits in the queue, decrements the number of queue spaces available, copies the item into the messageQueue, and posts a signal that an item is available in the queue, returning 1 for success. Otherwise, if the queue is full, returns 0 for failure. _**Cannot be interrupted midway by an higher priority ISR.**_
 ```
 queueReceiveISR(messageQueue* queue, void* destination)
 ```
-If data exists in the queue, decrements the number of items available, copies the item into destination, and posts a signal that a new space is available in the queue, returning 1 for success. Otherwise, if the queue is empty, the task sleeps until an item is added to the queue. **Cannot be interrupted midway by an higher priority ISR.**
+If data exists in the queue, decrements the number of items available, copies the item into destination, and posts a signal that a new space is available in the queue, returning 1 for success. Otherwise, if the queue is empty, the task sleeps until an item is added to the queue. _**Cannot be interrupted midway by an higher priority ISR.**_
 
 #### Additional Message Queue Functions
 ```
 int queueEmpty(messageQueue* queue)
 ```
-Returns 1 if the queue is empty, and 0 otherwise. **Other tasks may be reading or writing during this.**
+Returns 1 if the queue is empty, and 0 otherwise. _**Other tasks may be reading or writing during this.**_
 ```
 int queueFull(messageQueue* queue)
 ```
-Returns 1 if the queue is full, and 0 otherwise. **Other tasks may be reading or writing during this.**
+Returns 1 if the queue is full, and 0 otherwise. _**Other tasks may be reading or writing during this.**_
 ```
 queueReset(messageQueue* queue)
 ```
-Resets the message queue, setting queue capacity to full. **Cannot be interrupted midway by an ISR, and OVERWRITES the mutex. Use only when no other task/core is accessing the queue.**
+Resets the message queue, setting queue capacity to full. _**Cannot be interrupted midway by an ISR, and OVERWRITES the mutex. Use only when no other task/core is accessing the queue.**_
 ```
 queuePeek(messageQueue* queue)
 ```
-If items available in the queue, directly grabs the first item available without removing it from the queue. **Cannot be interrupted by an ISR, but other tasks may read or write during this.**
-
+If items available in the queue, directly grabs the first item available without removing it from the queue. _**Cannot be interrupted by an ISR, but other tasks may read or write during this.**_
 
 ## Benchmarking
+### Context Switching
+Achived 4.309µs context switching.
 
 ## Acknowledgements
