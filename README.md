@@ -118,7 +118,11 @@ queuePeek(messageQueue* queue)
 If items available in the queue, directly grabs the first item available without removing it from the queue. _**Cannot be interrupted by an ISR, but other tasks may read or write during this.**_
 
 ## Benchmarking
-### Context Switching
-Achived 4.309µs context switching.
+| Metric                          | Result    | Notes                                           |
+|---------------------------------|-----------|------------------------------------------------|
+| Context switch latency           | 4.309 µs  | Time to switch between two tasks              |
+| Scheduler boot time              | 11.309 µs | Time to initialize scheduler and start first task |
+| Task creation → first execution  | 16.44 µs  | From creating a task to its first run        |
+
 
 ## Acknowledgements
