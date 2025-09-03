@@ -22,12 +22,16 @@ typedef struct taskController {
 	struct taskController* next;
 } taskController;
 
+extern taskController* currentTaskController;
+
 // scheduler functions
 taskController* addTask(taskPtr taskProvided, uint8_t taskPriority); // add any task to be managed
 void startScheduler(void); // begin scheduling
 
 void addReadyTask(taskController* task);
 void removeReadyTask(taskController* task);
+
+void taskFinish();
 
 void schedulerYield();
 void schedulerBlockCurrent(semaphore* sem);

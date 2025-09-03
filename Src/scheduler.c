@@ -4,7 +4,7 @@
 #include <stddef.h>
 
 #define MAX_TASKS 5
-#define STACK_SIZE 128
+#define STACK_SIZE 128 // 16 registers, each 32 bits/8 bytes
 #define CLK_TICK_SPEED 1000
 #define PRIORITY_LEVELS 11 // 11 levels, from 0 to 10 (0 is reserved for idle task)
 
@@ -18,7 +18,7 @@ static uint32_t readyBitmap = 0;
 
 static uint8_t tasksManaged = 0; // number of tasks total
 
-static taskController* currentTaskController;
+taskController* currentTaskController;
 static taskController* idleTaskController;
 
 void addReadyTask(taskController* task) {
@@ -94,6 +94,13 @@ int schedulerUnblockTask(semaphore* sem) {
 	return 0;
 }
 
+
+void taskFinish() {
+	currentTaskController->currentState = BLOCKED;
+	currentTaskController->waitingFor = NULL;
+	schedulerYield();
+}
+
 void idleTask(void) {
 	while (1) {
 		__WFI(); // low power wait for interrupt
@@ -165,8 +172,8 @@ void startScheduler(void) {
 	__ISB(); // flush pipeline so we directly use PSP now
 
 	// there are four priority bits on STM32
-	NVIC_SetPriority(PendSV_IRQn, 0xF0);
-	NVIC_SetPriority(SysTick_IRQn, 0xD0);
+	NVIC_SetPriority(PendSV_IRQn, 0b1111); // priority level 15 (lowest)
+	NVIC_SetPriority(SysTick_IRQn, 0b1110); // priority level 14 (second lowest)
 	SysTick_Config(SystemCoreClock / CLK_TICK_SPEED);
 
 	SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk; // start the first task IMMEDIATELY so we don't have to wait a cycle

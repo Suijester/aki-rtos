@@ -19,6 +19,10 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include <stdio.h>
+#include "scheduler.h"
+#include "semaphore.h"
+#include "messageQueue.h"
+#include "mutex.h"
 #include "stm32f4xx.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -58,6 +62,15 @@ static void MX_USART2_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+static inline void initDWT(void) {
+	  CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
+	  DWT->CYCCNT = 0;
+	  DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
+}
+
+static inline uint32_t getCyclesDWT(void) {
+	  return DWT->CYCCNT;
+}
 
 /* USER CODE END 0 */
 
