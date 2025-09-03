@@ -1,4 +1,4 @@
-# aki-rtos
+# Aki-RTOS
 _**High-performance RTOS designed for STM32 MCUs, with preemptive O(1) task scheduling, message queues, priority inheritance. <br> Achieved 4.309µs context switching, 11.309µs scheduler boot time, 16.44µs task creation to execution.**_
 
 Aki-RTOS is a bare-metal lightweight RTOS designed for embedded systems (primarily STM32, or any microcontroller with ARM Architecture) and can run on multi-core systems. It provides efficient preemptive task scheduling with priority inheritance, lightweight inter-task communication, and robust interrupt handling. Synchronization primitives include mutexes and semaphores. Aki-RTOS also supports optional ISR-to-Task communication, with robust ISR non-blocking message queue functions, and non-blocking semaphore access.
@@ -43,6 +43,7 @@ All mutexes must be initialized by this function, creating a mutex with no curre
 #### Locking & Unlocking (Priority Inheritance)
 `mutexLock(mutex* mutex, taskController* tcb)` 
 Tasks can pass their TCB (currentTaskControlller) and the mutex they want to own. If no task currently holds the mutex, the passed TCB immediately gains ownership of the mutex. If a task is holding the mutex, the task priority of the current owner is upgraded to the calling task's priority, if higher. The calling task then sleeps until it's the highest priority waiting task and the mutex is released. On wake, it immediately gains mutex ownership.
+
 `mutexUnlock(mutex* mutex, taskController* tcb)`
 Tasks can release the mutex if they currently hold it by calling this function. If the calling task doesn't hold the mutex, or the mutex is ownerless, nothing occurs. Otherwise, the calling task's priority is reset (in case of priority inheritance) and the task releases the mutex.
 
@@ -54,9 +55,29 @@ type dataBuffer[QUEUE_SIZE]
 ```
 For queues, buffers must be externally maintained, so different size message queues can be implemented. When initializing a message queue, an array of the data type within the queue must also be initialized.
 `queueConstructor(messageQueue* queue, void* dataLocation, uint8_t typeSize, uint8_t queueCapacity)`
-All message queues must be initialized by this function, creating a message queue pointing to the externally-maintained array.
+All message queues must be initialized by this function, creating a message queue pointing to the externally-maintained array. Message queues are single-port, meaning only one core can be reading or writing at any given time.
 
 #### Task-to-Task Communication
+`queueSend(messageQueue* queue, const void* item)`
+If capacity permits in the queue, decrements the number of queue spaces available, copies the item into the messageQueue, and posts a signal that an item is available in the queue. Otherwise, if the queue is full, the task sleeps until spaces are freed. **Cannot be interrupted midway by an ISR, and other threads cannot read or write during this.**
+`queueReceive(messageQueue* queue, void* destination)`
+If data exists in the queue, decrements the number of items available, copies the item into destination, and posts a signal that a new space is available in the queue. Otherwise, if the queue is empty, the task sleeps until an item is added to the queue. **Cannot be interrupted midway by an ISR, and other threads cannot read or write during this.**
+
+#### ISR-to-Task Communication
+`int queueSendISR(messageQueue* queue, const void* item)`
+If capacity permits in the queue, decrements the number of queue spaces available, copies the item into the messageQueue, and posts a signal that an item is available in the queue, returning 1 for success. Otherwise, if the queue is full, returns 0 for failure. **Cannot be interrupted midway by an higher priority ISR.**
+`queueReceiveISR(messageQueue* queue, void* destination)`
+If data exists in the queue, decrements the number of items available, copies the item into destination, and posts a signal that a new space is available in the queue, returning 1 for success. Otherwise, if the queue is empty, the task sleeps until an item is added to the queue. **Cannot be interrupted midway by an higher priority ISR.**
+
+#### Additional Message Queue Functions
+`int queueEmpty(messageQueue* queue)`
+Returns 1 if the queue is empty, and 0 otherwise. **Other tasks may be reading or writing during this.**
+`int queueFull(messageQueue* queue)`
+Returns 1 if the queue is full, and 0 otherwise. **Other tasks may be reading or writing during this.**
+`queueReset(messageQueue* queue)`
+Resets the message queue, setting queue capacity to full. **Cannot be interrupted midway by an ISR, and OVERWRITES the mutex. Use only when no other task/core is accessing the queue.**
+`queuePeek(messageQueue* queue)`
+If items available in the queue, directly grabs the first item available without removing it from the queue. **Cannot be interrupted by an ISR, but other tasks may read or write during this.**
 
 
 ## Benchmarking
