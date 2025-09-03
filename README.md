@@ -41,10 +41,14 @@ ISRs can call this to add a resource back to a semaphore. The highest priority t
 All mutexes must be initialized by this function, creating a mutex with no current owner and one available resource.
 
 #### Locking & Unlocking (Priority Inheritance)
-```mutexLock(mutex* mutex, taskController* tcb)```
+```
+mutexLock(mutex* mutex, taskController* tcb)
+```
 Tasks can pass their TCB (currentTaskControlller) and the mutex they want to own. If no task currently holds the mutex, the passed TCB immediately gains ownership of the mutex. If a task is holding the mutex, the task priority of the current owner is upgraded to the calling task's priority, if higher. The calling task then sleeps until it's the highest priority waiting task and the mutex is released. On wake, it immediately gains mutex ownership.
 
-```mutexUnlock(mutex* mutex, taskController* tcb)```
+```
+mutexUnlock(mutex* mutex, taskController* tcb)
+```
 Tasks can release the mutex if they currently hold it by calling this function. If the calling task doesn't hold the mutex, or the mutex is ownerless, nothing occurs. Otherwise, the calling task's priority is reset (in case of priority inheritance) and the task releases the mutex.
 
 ### Message Queues
