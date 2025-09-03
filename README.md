@@ -120,9 +120,14 @@ If items available in the queue, directly grabs the first item available without
 ## Benchmarking
 | Metric                          | Result    | Notes                                           |
 |---------------------------------|-----------|------------------------------------------------|
-| Context switch latency           | 4.309 µs  | Time to switch between two tasks              |
+| Context switch latency           | 4.309 µs  | Time to switch between any two tasks             |
 | Scheduler boot time              | 11.309 µs | Time to initialize scheduler and start first task |
 | Task creation → first execution  | 16.44 µs  | Time from adding task to first execution (includes booting)|
 
+### Methods
+Benchmarks were primarily determined by cycle count calculations using clock speed. Taking the cycles elapsed between starting and ending, it's possible to convert this into time by dividing against the clock frequency. Using this method, all numbers were calculated, although mileage may vary as timing violations may occur in higher-demand scenarios.
+
 
 ## Acknowledgements
+- STM32 (used their MCUs)
+- CUBEIDE
